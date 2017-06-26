@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Piłkarzyki</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <style>
+        @keyframes rotate{
+            from {transform: rotate(0deg);}
+            to   {transform: rotate(360deg);}
+        }
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background: url("bg.png");
+            background-size: auto;
+            overflow: hidden;
+            font-family: calibri;
+            font-size: 5vh;
+        }
+        #container{
+            box-sizing: border-box;
+            width: 63vh;
+            height: 63vh;
+            padding-top: 5vh;
+            display: inline-block;
+            position: absolute;
+            text-align: center;
+            margin: auto;
+            top: 0; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(green , green );
+            border-radius: 5px;
+            border: 1px solid black;
+            line-height: 2px;
+            box-shadow: 0px 5px 5px rgba(0,0,0,0.7);
+        }
+        .dot{
+            cursor: alias;
+            width: 4vh;
+            height: 4vh;
+            box-sizing:border-box;
+            display: inline-block;
+            background: url("middle.png");
+            background-size: contain;
+            float: left;
+            margin: 0px;
+            position: relative;
+        }
+        .dot:hover::after{
+            content: "";
+            position: absolute;
+            box-sizing: border-box;
+            top: 0.5vh;
+            left: 0.5vh;
+            width: 2.95vh;
+            height: 2.95vh;
+            border-radius: 50%;
+            border: 0.3vh dashed goldenrod;
+            background-size: contain;
+            opacity: 0.8;
+        }
+        .dot:not(.selected):hover::after{
+            animation: rotate 5s infinite linear;
+        }
+        .dot.selected::after{
+            content: "";
+            position: absolute;
+            box-sizing: border-box;
+            top: 0.55vh;
+            left: 0.55vh;
+            width: 2.95vh;
+            height: 2.95vh;
+            border-radius: 50%;
+            background: url("ball.png");
+            background-size: contain;
+            z-index: 200;
+        }
+        .start{
+            background: url("start.png");
+            background-size: contain;
+        }
+        .left{
+            background: url("side.png");
+            background-size: contain;
+        }
+        .right{
+            background: url("side.png");
+            background-size: contain;
+        }
+        .goal{
+            background: url("top.png");
+            background-size: contain;
+        }
+        .top{
+            background: url("top.png");
+            background-size: contain;
+        }
+        .bottom{
+            background: url("top.png");
+            background-size: contain;
+        }
+        .tr{
+            background: url("tr.png");
+            background-size: contain;
+        }
+        .tl{
+            background: url("tl.png");
+            background-size: contain;
+        }
+        .br{
+            background: url("br.png");
+            background-size: contain;
+        }
+        .bl{
+            background: url("bl.png");
+            background-size: contain;
+        }
+        .row{
+            position: relative;
+            display: inline-block;
+            box-sizing: border-box;
+            border-left: 0.3vh solid black;
+            border-right: 0.3vh solid black;
+            clear: both;
+            vertical-align: middle;
+        }
+        img{
+            position: absolute;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+        }
+        .crowd{
+            width: 0px;
+            height: 0px;
+            display: none;
+        }
+        #reset{
+            position: absolute;
+            top: 50vh;
+            left: 50vw;
+            transform: translate(-50%,-50%);
+            padding-left: 2vh;
+            padding-right: 2vh;
+            height: 5vh;
+            text-align: center;
+            line-height: 1.5vh;
+            outline: none;
+            font-size: 1.5vh;
+            background: white;
+            border: 1px solid black;
+            box-shadow: inset 0px 0px 5px black;
+            border-radius: 1vh;
+            z-index: 100;
+            transition: opacity 1s;
+        }
+        .red{
+            border-color: red !important;
+            box-shadow: inset 0px 0px 3px 2px red,
+                              0px 5px 5px rgba(0,0,0,0.7) !important;
+        }
+        .blue{
+            border-color: blue !important;
+            box-shadow: inset 0px 0px 3px 2px blue,
+                              0px 5px 5px rgba(0,0,0,0.7) !important;
+        }
+        .redText{
+            color: red;
+            text-shadow: 0px 0px 3px red;
+        }
+        .blueText{
+            color: blue;
+            text-shadow: 0px 0px 3px blue;
+        }
+        #reset:hover{
+            background: lightyellow;
+        }
+        #reset:active{
+            background: rgb(242, 235, 188);
+        }
+        .row:first-of-type{
+            border-top: 0.7vh solid red;
+        }
+        .row:last-of-type{
+            border-bottom: 0.7vh solid blue;
+        }
+        #score{
+            position: absolute;
+            left: 50vw;top: 0px;
+            transform: translateX(-50%);
+            width: 30vh;
+            height: 10vh;
+            background: rgba(0,0,0,0.7);
+            border-bottom: 1px solid goldenrod;
+            color: white;
+            box-shadow: inset 0px 0px 5px goldenrod,
+                        0px 5px 5px rgba(0,0,0,0.7),
+                        0px 0px 5px goldenrod;
+            border-bottom-left-radius: 2vh;
+            border-bottom-right-radius: 2vh;
+            border-left: 5px solid rgba(0,0,255,0.7);
+            border-right: 5px solid red;
+            font-size: 7vh;
+            text-align: center;
+            line-height: 10vh;
+            word-spacing: 4vh;
+            text-shadow: 0px 0px 1vh white;
+        }
+        #info{
+            position: absolute;
+            left: 50vw;top: 12vh;
+            transform: translateX(-50%);
+            width: 70vw;
+            height: 5vh;
+            line-height: 5vh;
+            background: rgba(0,0,0,0.7);
+            border-radius: 2vh;
+            border: 1px solid goldenrod;
+            color: white;
+            box-shadow: inset 0px 0px 5px goldenrod,
+                        0px 0px 5px goldenrod;
+            font-size: 3vh;
+            text-align: center;
+            text-shadow: 0px 0px 1vh goldenrod;
+        }
+        .disabled{
+            user-select: none;
+            pointer-events: none;
+            filter: grayscale();
+            transition: filter 3s;
+        }
+        .invisible{
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+        #savedGame{
+            width: 20vh;
+            height: 29vh;
+            overflow: auto;
+            background: rgba(0,0,0,0.7);
+            border-bottom-right-radius: 1vh;
+            border-right: 1px solid goldenrod;
+            border-bottom: 1px solid goldenrod;
+            color: white;
+            box-shadow: inset 0px 0px 5px goldenrod,
+                        0px 0px 5px goldenrod;
+            text-shadow: 0px 0px 5px white;
+            font-size: 2vh;
+        }
+        p{
+            display: inline-block;
+            margin-left: 0.5vh;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,0);
+            border-bottom-right-radius: 1vh;
+            border-bottom-left-radius: 1vh;
+        }
+        ::-webkit-scrollbar-thumb {
+            margin: 2px;
+            background: goldenrod;
+            border-radius: 1vh;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: #aaa;
+        }
+        .red_move{
+            z-index: 100;
+        }
+        .blue_move{
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="savedGame" class="invisible"></div>
+    <button id="reset" onclick="reset();">NOWA RUNDA</button>
+    <div id="score">0 - 0</div>
+    <div id="info"></div>
+    <div id="container" class="blue">
+        <div class="row">
+            <div class="dot empty" id="A0"></div><div class="dot empty" id="A1"></div><div class="dot empty" id="A2"></div>
+            <div class="dot tl goal net" id="A3"><div class="crowd"></div></div><div class="dot goal top net" id="A4"><div class="crowd"></div></div><div class="dot tr goal net" id="A5"><div class="crowd"></div></div>
+            <div class="dot empty " id="A6"></div><div class="dot empty" id="A7"></div><div class="dot empty" id="A8"></div>
+        </div><br> <!--          , --- ,          -->
+        <div class="row">
+            <div class="dot tl" id="B0"><div class="crowd"></div></div><div class="dot top" id="B1"><div class="crowd"></div></div><div class="dot top" id="B2"><div class="crowd"></div></div>
+            <div class="dot br" id="B3"><div class="crowd"></div></div><div class="dot" id="B4"></div><div class="dot bl" id="B5"><div class="crowd"></div></div>
+            <div class="dot top" id="B6"><div class="crowd"></div></div><div class="dot top" id="B7"><div class="crowd"></div></div><div class="dot tr" id="B8"><div class="crowd"></div></div>
+        </div><br> <!-- . ------ .     . ------ . -->
+        <div class="row">
+            <div class="dot left" id="C0"><div class="crowd"></div></div><div class="dot" id="C1"></div><div class="dot" id="C2"></div>
+            <div class="dot" id="C3"></div><div class="dot" id="C4"></div><div class="dot" id="C5"></div>
+            <div class="dot" id="C6"></div><div class="dot" id="C7"></div><div class="dot right" id="C8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="dot left" id="D0"><div class="crowd"></div></div><div class="dot" id="D1"></div><div class="dot" id="D2"></div>
+            <div class="dot" id="D3"></div><div class="dot" id="D4"></div><div class="dot" id="D5"></div>
+            <div class="dot" id="D6"></div><div class="dot" id="D7"></div><div class="dot right" id="D8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="dot left" id="E0"><div class="crowd"></div></div><div class="dot" id="E1"></div><div class="dot" id="E2"></div>
+            <div class="dot" id="E3"></div><div class="dot" id="E4"></div><div class="dot" id="E5"></div>
+            <div class="dot" id="E6"></div><div class="dot" id="E7"></div><div class="dot right" id="E8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="dot left" id="F0"><div class="crowd"></div></div><div class="dot" id="F1"></div><div class="dot" id="F2"></div>
+            <div class="dot" id="F3"></div><div class="dot " id="F4"></div><div class="dot" id="F5"></div>
+            <div class="dot" id="F6"></div><div class="dot" id="F7"></div><div class="dot right" id="F8"><div class="crowd"></div></div>
+        </div><br> <!-- |          ___          | -->
+        <div class="row">
+            <div class="dot left" id="G0"><div class="crowd"></div></div><div class="dot" id="G1"></div><div class="dot" id="G2"></div>
+            <div class="dot" id="G3"></div><div class="dot selected start" id="G4"></div><div class="dot" id="G5"></div>
+            <div class="dot" id="G6"></div><div class="dot" id="G7"></div><div class="dot right" id="G8"><div class="crowd"></div></div>
+        </div><br> <!-- |         | . |         | -->
+        <div class="row">
+            <div class="dot left" id="H0"><div class="crowd"></div></div><div class="dot" id="H1"></div><div class="dot" id="H2"></div>
+            <div class="dot" id="H3"></div><div class="dot" id="H4"></div><div class="dot" id="H5"></div>
+            <div class="dot" id="H6"></div><div class="dot" id="H7"></div><div class="dot right" id="H8"><div class="crowd"></div></div>
+        </div><br> <!-- |          ---          | -->
+        <div class="row">
+            <div class="dot left" id="I0"><div class="crowd"></div></div><div class="dot" id="I1"></div><div class="dot" id="I2"></div>
+            <div class="dot" id="I3"></div><div class="dot" id="I4"></div><div class="dot" id="I5"></div>
+            <div class="dot" id="I6"></div><div class="dot" id="I7"></div><div class="dot right" id="I8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="dot left" id="J0"><div class="crowd"></div></div><div class="dot" id="J1"></div><div class="dot" id="J2"></div>
+            <div class="dot" id="J3"></div><div class="dot" id="J4"></div><div class="dot" id="J5"></div>
+            <div class="dot" id="J6"></div><div class="dot" id="J7"></div><div class="dot right" id="J8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="dot left" id="K0"><div class="crowd"></div></div><div class="dot" id="K1"></div><div class="dot" id="K2"></div>
+            <div class="dot" id="K3"></div><div class="dot" id="K4"></div><div class="dot" id="K5"></div>
+            <div class="dot" id="K6"></div><div class="dot" id="K7"></div><div class="dot right" id="K8"><div class="crowd"></div></div>
+        </div><br> <!-- |                       | -->
+        <div class="row">
+            <div class="bl dot" id="L0"><div class="crowd"></div></div><div class="dot bottom" id="L1"><div class="crowd"></div></div><div class="dot bottom" id="L2"><div class="crowd"></div></div>
+            <div class="dot tr" id="L3"><div class="crowd"></div></div><div class="dot" id="L4"></div><div class="dot tl" id="L5"><div class="crowd"></div></div>
+            <div class="dot bottom" id="L6"><div class="crowd"></div></div><div class="dot bottom" id="L7"><div class="crowd"></div></div><div class="dot br" id="L8"><div class="crowd"></div></div>
+        </div><br> <!-- . ------ .     . ------ . -->
+        <div class="row">
+            <div class="dot empty" id="M0"></div><div class="dot empty" id="M1"></div><div class="dot empty" id="M2"></div>
+            <div class="dot bl goal" id="M3"><div class="crowd"></div></div><div class="dot goal bottom" id="M4"><div class="crowd"></div></div><div class="dot br goal" id="M5"><div class="crowd"></div></div>
+            <div class="dot empty" id="M6"></div><div class="dot empty" id="M7"></div><div class="dot empty" id="M8"></div>
+        </div>     <!--          ' --- '          -->
+    </div>
+    <audio id="cheer" src="cheer.wav"></audio>
+    <audio id="whistle" src="whistle.wav"></audio>
+    <audio id="kick" src="kick.wav"></audio>
+</body>
+    <script>
+        var player = "blue";
+        var lastWinner = "red";
+        var blueScore = 0;
+        var redScore = 0;
+        var position1;
+        var position2;
+        var moveTable = {};
+        var firstMove = true;
+        var winByGoal = false;
+        var savedGame = "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>";
+       
+        $(".dot").click(function(event){
+            if(event.target.classList.contains("dot") == false){
+                return;
+            }
+            if(firstMove == true){
+                setInfoText();
+                firstMove = false;
+            }
+            position2 = event.target.id;
+            if(checkNeighbour(position1, position2) == true){ 
+                if(canMove(position2)){
+                    makeMove(position1, position2);
+                    updateSavedGame();
+                    var messageIndex = getRandomInt(0,99);
+                    if(messageIndex<messages.length){
+                        setInfoText(messages[messageIndex]);
+                    }
+                    checkEnd(position2);
+                }
+                if(!checkNext(position2)){
+                    changePlayer();
+                    console.log(position1);
+                    console.log(position2);
+                    position1 = position2;
+                    position2 = "";
+                }
+                else{
+                    position1 = position2;
+                    position2 = "";
+                }
+            }
+        });
+        
+        function setInfoText(text){
+            if(text == null){
+                document.getElementById("info").innerHTML = "";
+            }
+            else{
+                document.getElementById("info").innerHTML = text;
+            }
+        };
+        
+        function updateSavedGame(){
+            document.getElementById("savedGame").innerHTML = savedGame;
+            $("#savedGame").scrollTop($("#savedGame")[0].scrollHeight);
+        }
+        
+        $().ready(function(){
+            reset();
+            
+            document.getElementById("kick").volume = 0.01;
+            document.getElementById("cheer").volume = 0.01;
+            document.getElementById("whistle").volume = 0.01;
+        });
+        
+        function reset(){
+            $("#reset").addClass("invisible");
+            savedGame+="<br><p>GAME "+(blueScore+redScore+1).toString()+"<p><br>"+'<p class="'+player+'Text">'+player+"</p>:";
+            createMoveTable();
+            position1 = "G4";
+            position2 = "";
+            firstMove = true;
+            winByGoal = false;
+            $(".dot").each(function(){
+                $(this).removeClass("disabled");
+            });
+            var images = document.getElementsByTagName('img');
+            var l = images.length;
+            for (var i= document.images.length; i-->0;)
+                document.images[i].parentNode.removeChild(document.images[i]);
+            $(".selected").removeClass("selected");
+            $("#"+position1).addClass("selected");
+            lastWinner == "red" ? player = "blue" : player = "red";
+            setInfoText("Rozpoczyna gracz "+ (lastWinner == "red" ? "niebieski!" : "czerwony!"));
+        };
+        
+        function changePlayer(){
+            if(player == "blue") {
+                player = "red";
+                $("#container").removeClass("blue");
+                $("#container").addClass("red");
+            }
+            else {
+                player = "blue";
+                $("#container").removeClass("red");
+                $("#container").addClass("blue");
+            }
+            savedGame+="<br>"+'<p class="'+player+'Text">'+player+"</p>:";
+        };
+
+        function checkEnd(position){
+            var gameEnd = false;
+            if($("#"+position).hasClass("goal")){
+                if($("#"+position).hasClass("top") || $("#"+position).hasClass("tr") || $("#"+position).hasClass("tl")){
+                    lastWinner = "blue";
+                    blueScore++;
+                    winByGoal = true;
+                    gameEnd = true;
+                }
+                if($("#"+position).hasClass("bottom") || $("#"+position).hasClass("br") || $("#"+position).hasClass("bl")){
+                    lastWinner = "red";
+                    redScore++;
+                    winByGoal = true;
+                    gameEnd = true;
+                }
+            }
+            else if(moveTable[position] == 0){
+                player == "red" ? lastWinner = "blue" : lastWinner = "red";
+                player == "red" ? blueScore++ : redScore++;
+                gameEnd = true;
+            }
+            document.getElementById("score").innerHTML = blueScore + " - " + redScore;
+            if(gameEnd == true){
+                $(".dot").each(function(index, obj){
+                    $(this).addClass("disabled");
+                });
+                if(winByGoal == true){
+                    savedGame += '<p>GOL!</p>'
+                    setTimeout(function(){setInfoText("G")},0);
+                    setTimeout(function(){setInfoText("GO")},100);
+                    setTimeout(function(){setInfoText("GOO")},200);
+                    setTimeout(function(){setInfoText("GOOO")},300);
+                    setTimeout(function(){setInfoText("GOOOO")},400);
+                    setTimeout(function(){setInfoText("GOOOOO")},500);
+                    setTimeout(function(){setInfoText("GOOOOOO")},600);
+                    setTimeout(function(){setInfoText("GOOOOOOO")},700);
+                    setTimeout(function(){setInfoText("GOOOOOOOO")},800);
+                    setTimeout(function(){setInfoText("GOOOOOOOOL")},900);
+                    setTimeout(function(){setInfoText("GOOOOOOOOL!")},1000);
+                    setTimeout(function(){setInfoText("GOOOOOOOOL!!")},1100);
+                    setTimeout(function(){setInfoText("GOOOOOOOOL!!!")},1200);
+                    setTimeout(function(){setInfoText("Koniec gry! Wygrywa gracz " + (lastWinner == "red" ? "czerwony!" : "niebieski!"))},2000);
+                }
+                else{
+                    setInfoText("Koniec gry! Wygrywa gracz " + (lastWinner == "red" ? "czerwony!" : "niebieski!"));
+                    savedGame += '<p>STOP!</p>'
+                }
+                updateSavedGame();
+                document.getElementById("cheer").pause();
+                document.getElementById("cheer").play();
+                document.getElementById("whistle").pause();
+                document.getElementById("whistle").play();
+                $("#reset").removeClass("invisible");
+            }
+        };
+        
+        function checkNeighbour(position1, position2){
+            if(Math.abs(position1.charCodeAt(0) - position2.charCodeAt(0)) > 1){
+                return false;
+            }
+            if(Math.abs(position1.charCodeAt(1) - position2.charCodeAt(1)) > 1){
+                return false;
+            }
+            if($("#"+position2).hasClass("empty")){
+                return false;
+            }
+            if($("#"+position1).hasClass("left") && $("#"+position2).hasClass("left")) return false;
+            if($("#"+position1).hasClass("left") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("left") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("right") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("right") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("right") && $("#"+position2).hasClass("br")) return false;
+            
+            if($("#"+position1).hasClass("top") && $("#"+position2).hasClass("top")) return false;
+            if($("#"+position1).hasClass("top") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("top") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("top") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("top") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("bottom") && $("#"+position2).hasClass("bottom")) return false;
+            if($("#"+position1).hasClass("bottom") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("bottom") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("bottom") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("bottom") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("bottom") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("top") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("tr") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("top") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("left")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("bottom") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("tl") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("bottom") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("top") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("left")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("br") && $("#"+position2).hasClass("bl")) return false;
+            
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("bottom") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("left")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("top") && !$("#"+position2).hasClass("goal")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("right")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("tr")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("br")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("tl")) return false;
+            if($("#"+position1).hasClass("bl") && $("#"+position2).hasClass("bl")) return false;
+            
+            var field1 = document.getElementById(position1);
+            var field2 = document.getElementById(position2);
+            
+            var factor1 = position1.charCodeAt(0) - position2.charCodeAt(0);
+            var factor2 = position1.charCodeAt(1) - position2.charCodeAt(1);
+            
+            var position = [factor1, factor2];
+            var tileName1 = "";
+            var tileName2 = "";
+            
+            switch(position.join(',')){
+                case "-1,-1": tileName1="NW"+"_"; tileName2="SE"+"_";  break;
+                case "-1,0":  tileName1="N"+"_";  tileName2="S"+"_";   break;
+                case "-1,1":  tileName1="NE"+"_"; tileName2="SW"+"_";  break;
+                case "0,-1":  tileName1="W"+"_";  tileName2="E"+"_";   break;
+                case "0,1":   tileName1="E"+"_";  tileName2="W"+"_";   break;
+                case "1,-1":  tileName1="SW"+"_"; tileName2="NE"+"_";  break;
+                case "1,0":   tileName1="S"+"_";  tileName2="N"+"_";   break;
+                case "1,1":   tileName1="SE"+"_"; tileName2="NW"+"_";  break;
+            }
+            
+            if(field2.innerHTML.indexOf('"'+tileName1) !== -1) return false;
+            
+            return true;
+        };
+        
+        function makeMove(position1, position2){
+            var field1 = document.getElementById(position1);
+            var field2 = document.getElementById(position2);
+            
+            var factor1 = position1.charCodeAt(0) - position2.charCodeAt(0);
+            var factor2 = position1.charCodeAt(1) - position2.charCodeAt(1);
+            
+            var position = [factor1, factor2];
+            var tileName1 = "";
+            var tileName2 = "";
+            
+            switch(position.join(',')){
+                case "-1,-1": tileName1="NW"+"_"+player+".png"; tileName2="SE"+"_"+player+".png"; savedGame+="<p>↘</p>"; break;
+                case "-1,0":  tileName1="N"+"_"+player+".png";  tileName2="S"+"_"+player+".png";  savedGame+="<p>↓</p>"; break;
+                case "-1,1":  tileName1="NE"+"_"+player+".png"; tileName2="SW"+"_"+player+".png"; savedGame+="<p>↙</p>"; break;
+                case "0,1":   tileName1="E"+"_"+player+".png";  tileName2="W"+"_"+player+".png";  savedGame+="<p>←</p>"; break;
+                case "1,1":   tileName1="SE"+"_"+player+".png"; tileName2="NW"+"_"+player+".png"; savedGame+="<p>↖</p>"; break;
+                case "1,0":   tileName1="S"+"_"+player+".png";  tileName2="N"+"_"+player+".png";  savedGame+="<p>↑</p>"; break;
+                case "1,-1":  tileName1="SW"+"_"+player+".png"; tileName2="NE"+"_"+player+".png"; savedGame+="<p>↗</p>"; break;
+                case "0,-1":  tileName1="W"+"_"+player+".png";  tileName2="E"+"_"+player+".png";  savedGame+="<p>→</p>"; break;
+            }
+            field1.innerHTML += '<img src="'+tileName2+'" class="'+player+'_move"/>';
+            field2.innerHTML += '<img src="'+tileName1+'" class="'+player+'_move"/>';
+            
+            $("#"+field1.id).removeClass("selected");
+            $("#"+field2.id).addClass("selected");
+            
+            moveTable[field1.id]-=1;
+            moveTable[field2.id]-=1;
+            
+            document.getElementById("kick").pause();
+            document.getElementById("kick").play();
+        };
+        
+        function canMove(position){
+            if(moveTable[position] > 0 && !$("#"+position.id).hasClass("empty")){
+                return true;
+            }
+            return false;
+        };
+        
+        function checkNext(position){
+            if(moveTable[position] > 0 && document.getElementById(position).childElementCount > 1 && !$("#"+position.id).hasClass("empty")){
+                return true;
+            }
+            return false;
+        };
+        
+        function createMoveTable(){
+            moveTable = {};
+            $(".dot").each(function(index, dot){
+                if($(this).hasClass("tl"))          {moveTable[$(this).attr('id')] = 1;}
+                else if($(this).hasClass("tr"))     {moveTable[$(this).attr('id')] = 1;}
+                else if($(this).hasClass("bl"))     {moveTable[$(this).attr('id')] = 1;}
+                else if($(this).hasClass("br"))     {moveTable[$(this).attr('id')] = 1;}
+                else if($(this).hasClass("top"))    {moveTable[$(this).attr('id')] = 3;}
+                else if($(this).hasClass("left"))   {moveTable[$(this).attr('id')] = 3;}
+                else if($(this).hasClass("right"))  {moveTable[$(this).attr('id')] = 3;}
+                else if($(this).hasClass("empty"))  {moveTable[$(this).attr('id')] = 0;}
+                else{                                moveTable[$(this).attr('id')] = 8;}
+            });
+            moveTable['B3'] = 5;
+            moveTable['B5'] = 5;
+            moveTable['L3'] = 5;
+            moveTable['L5'] = 5;
+        };
+        
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        };
+        
+        var messages = [
+            "Jak kopiesz kretynie!",  
+            "Moja babcia szybciej biega...",  
+            "Sędzia kalosz!",  
+            "Może lepiej pograj w golfa",  
+            "Większy burdel niż u mnie w pokoju",  
+            "Strzelaj kurwa!",  
+            "Kiedy reklamy, chce mi się siku :(",  
+            "Koniec gry, Mati zabiera piłkę",  
+            "Gruby na bramkę!",  
+            "A idź pan w chuj z taką piłką...",  
+            "*dźwięki wuwuzeli*",
+            "Sponsorem imprezy jest M. Sarepska",
+            "Pamiętaj o teczce z wynikami badań",
+            "事ソシエ小構そ査言ラゆ属聞ざ辺負",
+            "Morduj foczki szybciutko!",
+            "Made by Pyra Inc.™",
+        ];
+    </script>
+</html>

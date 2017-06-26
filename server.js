@@ -1,107 +1,103 @@
-//  OpenShift sample Node application
-var express = require('express'),
-    fs      = require('fs'),
-    app     = express(),
-    eps     = require('ejs'),
-    morgan  = require('morgan');
-    
-Object.assign=require('object-assign')
+var express = require('express');
+var favicon = require('serve-favicon');
+var path = require('path');
+var bodyParser = require('body-parser');
+var fs = require('fs');
+var nodemailer = require('nodemailer');
 
-app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'))
+var app = express();
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+app.use(favicon(__dirname + '/public/favicon.ico'));
 
-if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
-      mongoUser = process.env[mongoServiceName + '_USER'];
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/gfx')));
+app.use(express.static(path.join(__dirname, 'public/thumbnails')));
+app.use(express.static(path.join(__dirname, 'public/views')));
 
-  if (mongoHost && mongoPort && mongoDatabase) {
-    mongoURLLabel = mongoURL = 'mongodb://';
-    if (mongoUser && mongoPassword) {
-      mongoURL += mongoUser + ':' + mongoPassword + '@';
+// create reusable transporter object using the default SMTP transport
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'dawid.skorewicz@gmail.com', // Your email id
+        pass: '!Szarawary171!g' // Your password
     }
-    // Provide UI label that excludes user id and pw
-    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
-    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
+});
 
-  }
+app.get('/content/:selector', function(req,res,next){
+    var contents;
+    var selector = req.params.selector;
+    var filename = path.join(__dirname, "views/" + selector + ".html");
+    fs.readFile(filename, 'utf8', function(err, data) {
+        if (err) {
+            var err = new Error();
+            err.status = 404;
+            next(err);
+        }
+        else{
+            console.log('OK Reading: ' + filename);
+            contents = data;
+            res.send(contents);
+        }
+    });
+});
+
+app.post('/sendMessage', function(req,res,next){
+    var mailOptions = {
+        from: req.body.address, // sender address
+        to: 'dawid.skorewicz@gmail.com', // list of receivers
+        subject: req.body.topic, // Subject line
+        html: "<i>You have received e-mail from "+req.body.address+"</i><br><br><b>Message:</b><br><br>"+req.body.message
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            console.log(error);
+            res.json({yo: 'error'});
+        }
+        else{
+            console.log('Message sent: ' + info.response);
+            res.json({yo: info.response});
+        };
+    });
+});
+
+app.get('/projects', function(req,res,next){
+    var projects;
+    var projectsResult;
+    var dbPath = path.join(__dirname, "db/json/db.json");
+    fs.readFile(dbPath, 'utf8', function(err, data) {
+        if (err) {
+            var err = new Error();
+            err.status = 404;
+            next(err);
+        }
+        else{
+            console.log('OK Reading: ' + dbPath);
+            projects = JSON.parse(data);
+            projectsResult = parseProjects(projects);
+            res.send(projectsResult);
+        }
+    });
+});
+
+app.use(function (err, req, res, next) {
+    res.send('<h1 class="col-12 col-m-12 col-p-12">404</h1>This is not a page you are looking for.');
+})
+
+app.listen(3000,function(){
+    console.log("Listening on port 3000");  
+});
+
+function parseProjects(projects){
+    var result = "";
+    for(var i=0;i<projects.projects.length;i++){
+        var project = projects.projects[i];
+        result += '<div class="project col-6 col-m-12 col-p-12">';
+        result += '<div class="thumbnail" style="background: url('+project.thumbnail+')" onclick="window.open(\''+project.url+'\',\'window\');\"></div>';
+        result += '<a class="title" href="'+project.url+'" target="_blank">'+project.name+'</a>';
+        result += '<p class="description">'+project.description+'</p>';
+        result += '</div>';
+    }
+    return result;
 }
-var db = null,
-    dbDetails = new Object();
-
-var initDb = function(callback) {
-  if (mongoURL == null) return;
-
-  var mongodb = require('mongodb');
-  if (mongodb == null) return;
-
-  mongodb.connect(mongoURL, function(err, conn) {
-    if (err) {
-      callback(err);
-      return;
-    }
-
-    db = conn;
-    dbDetails.databaseName = db.databaseName;
-    dbDetails.url = mongoURLLabel;
-    dbDetails.type = 'MongoDB';
-
-    console.log('Connected to MongoDB at: %s', mongoURL);
-  });
-};
-
-app.get('/', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    var col = db.collection('counts');
-    // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
-    col.count(function(err, count){
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-    });
-  } else {
-    res.render('index.html', { pageCountMessage : null});
-  }
-});
-
-app.get('/pagecount', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    db.collection('counts').count(function(err, count ){
-      res.send('{ pageCount: ' + count + '}');
-    });
-  } else {
-    res.send('{ pageCount: -1 }');
-  }
-});
-
-// error handling
-app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.status(500).send('Something bad happened!');
-});
-
-initDb(function(err){
-  console.log('Error connecting to Mongo. Message:\n'+err);
-});
-
-app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
-
-module.exports = app ;

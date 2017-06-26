@@ -1,0 +1,459 @@
+/* RESET ----------------------------------------------- */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* BASIC TAGS ------------------------------------------ */
+h1{
+    margin-top: 30px;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 50px;
+    text-shadow: 0px 0px 10px white;
+    z-index: 2;
+}
+body{
+    background: black;
+    /*
+    background: linear-gradient(
+        black 0%,
+        black 80%,
+        lightgray 95%,
+        white);
+    */
+}
+
+/* KEYFRAMES ------------------------------------------- */
+@keyframes blink{
+    from   {opacity:0;}
+    to     {opacity:1;}
+}
+@keyframes rotate{
+    from   {transform: rotateZ(0deg);}
+    to     {transform: rotateZ(360deg);}
+}
+@keyframes rotateY{
+    from   {transform: rotateY(0deg);}
+    to     {transform: rotateY(360deg);}
+}
+@keyframes blur-in{
+    from    {filter: blur(10px);}
+    to      {filter: blur(0px);}
+}
+@keyframes fade-in{
+    from    {opacity: 0;}
+    to      {opacity: 1;}
+}
+@keyframes grow{
+    from    {width: 0%; left: 50%;}
+    to      {width: 90%; left: 5%;}
+}
+
+/* RESPONSIVE DESIGN ----------------------------------- */
+[class*="col-"] {
+    float: left;
+    padding: 15px;
+}
+@media only screen and (min-width: 0px) {
+    /* For phones: */
+    .col-p-1 {width: 8.33%;}
+    .col-p-2 {width: 16.66%;} 
+    .col-p-3 {width: 25%;}
+    .col-p-4 {width: 33.33%;}
+    .col-p-5 {width: 41.66%;}
+    .col-p-6 {width: 50%;}
+    .col-p-7 {width: 58.33%;}
+    .col-p-8 {width: 66.66%;}
+    .col-p-9 {width: 75%;}
+    .col-p-10 {width: 83.33%;}
+    .col-p-11 {width: 91.66%;}
+    .col-p-12 {width: 100%;}
+    #main_menu {       
+        height: 10vh;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        padding: 0;
+        margin: 0px;
+    }
+    .menu_item{
+        display: inline-block;
+        width: 24%;
+        padding: 0px;
+        margin: 0px;
+        overflow: hidden;
+        text-align: center;
+    }
+    .menu_item > span.maxi{
+        display: none;
+    }
+    .menu_item > span.mini{
+        display: inline-block;
+    }
+    .menu_item > span{
+        left: 0px;
+    }
+    .menu_item:hover{
+        transition: font-size 0.2s;
+    }
+    #content{
+        height: 90vh;
+        overflow: auto;
+    }
+    ::-webkit-scrollbar{
+        width: 12px;  /* for vertical scrollbars */
+        height: 12px; /* for horizontal scrollbars */
+        display: none;
+    }
+}
+@media only screen and (min-width: 780px) {
+    /* For tablets: */
+    .col-m-1 {width: 8.33%;}
+    .col-m-2 {width: 16.66%;}
+    .col-m-3 {width: 25%;}
+    .col-m-4 {width: 33.33%;}
+    .col-m-5 {width: 41.66%;}
+    .col-m-6 {width: 50%;}
+    .col-m-7 {width: 58.33%;}
+    .col-m-8 {width: 66.66%;}
+    .col-m-9 {width: 75%;}
+    .col-m-10 {width: 83.33%;}
+    .col-m-11 {width: 91.66%;}
+    .col-m-12 {width: 100%;}
+    #main_menu {       
+        height: 10vh;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .menu_item{
+        display: inline-block;
+        width: 24.5%;
+        padding: 0px;
+        margin: 0px;
+        text-align: left;
+    }
+    .menu_item:hover{
+        transition: font-size 0.2s;
+    }
+    .menu_item > span.maxi{
+        display: inline-block;
+    }
+    .menu_item > span.mini{
+        display: none;
+    }
+    .menu_item > span{
+        left: 30px;
+    }
+    #content{
+        height: 90vh;
+        overflow: auto;
+    }
+}
+@media only screen and (min-width: 1300px) {
+    /* For desktop: */
+    .col-1 {width: 8.33%;}
+    .col-2 {width: 16.66%;}
+    .col-3 {width: 25%;}
+    .col-4 {width: 33.33%;}
+    .col-5 {width: 41.66%;}
+    .col-6 {width: 50%;}
+    .col-7 {width: 58.33%;}
+    .col-8 {width: 66.66%;}
+    .col-9 {width: 75%;}
+    .col-10 {width: 83.33%;}
+    .col-11 {width: 91.66%;}
+    .col-12 {width: 100%;}
+    #main_menu{
+        height: 100vh;
+        border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    .menu_item{
+        display: block;
+        width: 100%;
+        text-align: left;
+    }
+    .menu_item:hover{
+        font-size: 20px;
+        transition: font-size 0.2s;
+    }
+    .menu_item > span.maxi{
+        display: inline-block;
+    }
+    .menu_item > span.mini{
+        display: none;
+    }
+    .menu_item > span{
+        left: 30px;
+    }
+    #content{
+        height: 100vh;
+        overflow: auto;
+    }
+}
+
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* CONTENT --------------------------------------------- */
+#content{
+    font-family: calibri;
+    position: relative;
+    background: url(../gfx/bg.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: lightgray;
+    text-shadow: 0px 0px 2px black;
+}
+
+/* MENU ------------------------------------------------ */
+#main_menu {
+    /*background: rgb(5,5,5);*/
+    background: linear-gradient(to right,
+        rgb(30,30,30),
+        black 40%);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.menu{
+    width: 100%;
+    list-style-type: none;
+}
+.menu_item {
+    font-family: "Courier New", Courier, monospace;
+    position: relative;
+    height: 60px;
+    font-size: 16px;
+    line-height: 60px;
+    color: lightgray;
+    cursor: pointer;
+    user-select: none;
+    transition: font-size 0.2s;
+}
+.menu_item:before{
+    position: absolute;
+    top: 42px;
+    content: "";
+    height: 1px;
+    width: 0%;
+    left: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: width 0.2s, left 0.2s;
+}
+.menu_item:hover:before{
+    width: 100%;
+    left: 0;
+    transition: width 0.2s, left 0.2s;
+}
+.menu_item:hover:after{ /* our:work is:never:over :D */
+    position: absolute;
+    left: 0px;
+    animation: blink 0.5s infinite alternate ;
+    content: ">";
+}
+.menu_item > span{
+    position: relative;
+    pointer-events: none;
+}
+.green {
+    color: limegreen;
+}
+
+/* LOGO ------------------------------------------------ */
+#logo_container {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 320px;
+    animation: blur-in 2s forwards;
+    background: url(../gfx/grid.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+#logo {
+    position: relative;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    top: 75px;
+    left: 75px;
+    background: linear-gradient(
+                white,
+                white 50%,
+                black 50%,
+                black);
+    animation: rotate 3s infinite reverse;
+    animation-timing-function: ease-in-out;
+    box-shadow: 0px 0px 20px white;
+}
+#logo:before {
+    position: absolute;
+    top: 38px;
+    left: 73px;
+    display: block;
+    content: " ";
+    width: 23px;
+    height: 23px;
+    border: 25px solid black;
+    border-radius: 50%;
+    background: white;
+}
+#logo:after {
+    position: absolute;
+    top: 38px;
+    display: block;
+    content: " ";
+    width: 23px;
+    height: 23px;
+    border: 25px solid white;
+    border-radius: 50%;
+    background: black;
+}
+#logo_text {
+    position: absolute;
+    font-family: calibri;
+    bottom: 0px;
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    width: 100%;
+    color: white;
+    text-shadow: 0px 0px 20px white;
+}
+
+/* SCROLLBAR ------------------------------------------- */
+::-webkit-scrollbar{
+  width: 12px;  /* for vertical scrollbars */
+  height: 12px; /* for horizontal scrollbars */
+}
+::-webkit-scrollbar-track{
+  background: rgba(255,255,255,0.1);
+}
+::-webkit-scrollbar-thumb{
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* PROJECT --------------------------------------------- */
+.project{
+    display: inline-block;
+    opacity: 0;
+    position: relative;
+    margin-bottom: 30px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    transition: background 0.2s;
+    animation: fade-in 1s 1s forwards;
+}
+.project:hover{
+    background: rgba(40,40,50,0.3);
+    transition: background 0.2s;
+}
+.project:after{
+    content: "FILE";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+.thumbnail{
+    display: block;
+    width: 200px;
+    height: 200px;
+    margin: auto;
+    border-radius: 5%;
+    box-shadow: inset 0px 0px 50px -1px black,
+                      0px 10px 10px black;
+    cursor: pointer;
+}
+.title{
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    text-decoration: none;
+    color: lightgray;
+    font-size: 30px;
+    font-weight: bold;
+}
+.description{
+    font-size: 16px;
+    width: 80%;
+    margin: auto;
+}
+#disclamer{
+    width: 100%;
+    text-align: center;
+}
+
+/* PERSONAL -------------------------------------------- */
+.frame{
+    display: inline-block;
+    float: left;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    text-shadow: 0px 0px 1px black;
+    opacity:0;
+    animation: fade-in 1s 1s forwards;
+}
+#photo{
+    display: inline-block;
+}
+#info_frame > p{
+    margin-bottom: 10px;
+}
+#story_frame{
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 15px;
+    width: 95%;
+}
+.link{
+    text-decoration: underline;
+    color: lightgray;
+}
+.link:visited{
+    text-decoration: underline;
+    color: lightgray;
+}
+
+/* CONTACT --------------------------------------------- */
+#form_frame{
+    border-top: 1px solid rgba(255,255,255,0.1);
+    width: 95%;
+}
+.form_element{
+    width: 95%;
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 20px;
+    color: lightgray;
+    background: rgb(10,10,10);
+    border-radius: 5px;
+    border: 3px solid gray;
+    box-shadow: 0px 0px 1px 1px white,
+        inset 0px 0px 1px white;
+    resize: none;
+    outline: none;
+}
+#send{
+    width: 200px;
+    box-shadow: 0px 0px 1px 1px yellow,
+        inset 0px 0px 1px yellow;
+}
+#send:hover{
+    box-shadow: 0px 0px 10px 1px yellow,
+        inset 0px 0px 10px yellow;
+}
+#send:active{
+    text-shadow: 0px 0px 10px yellow;
+}

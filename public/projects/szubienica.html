@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Szubienica</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            cursor: pointer;
+            background: url("bg.png");
+            background-size: auto;
+            overflow: hidden;
+            font-family: calibri;
+            font-size: 5vh;
+            user-select: none;
+        }
+        #container{
+            width: 80%;
+            height: 80%;
+            position: absolute;
+            margin: auto;
+            top: 0; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(goldenrod , white );
+            border-radius: 5px;
+            border: 1px solid black;
+            box-shadow: 
+                        0px 5px 5px rgba(0,0,0,0.7);
+        }
+        #hanged_man{
+            width: 100%;
+            height: 60%;
+            line-height: 50vh;
+            text-align: center;
+        }
+        #hanged_man > button{
+            width: 30vw;
+            height: 5vh;
+            position: absolute;
+            margin: auto;
+            top: -10vh; bottom: 0; left: 0; right: 0;
+        }
+        #password{
+            width: 100%;
+            height: 10%;
+            word-spacing: 1vw;
+        }
+        #password > p{
+            display: inline;
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+        #letters{
+            width: 100%;
+            height: 30%;
+        }
+        .row{
+            text-align: center;
+        }
+        .letter{
+            cursor: pointer;
+            font-family: calibri;
+            font-size: 3vh;
+            min-width: 5vh;
+            min-height: 5vh;
+            border: 1px solid black;
+            border-radius: 3px;
+            background: white;
+            box-shadow: 0px 0px 3px rgba(0,0,0,0.7);
+            outline: none;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .letter:hover{
+            cursor: pointer;
+            box-shadow: 0px 0px 5px rgb(197, 249, 164);
+            background: rgb(197, 249, 164);
+        }
+        .letter.inactive{
+            cursor: pointer;
+            opacity: 0.1;
+        }
+        .letter.inactive:hover{
+            box-shadow: none;
+            background: none;
+            pointer-events: none;
+        }
+        #image{
+            display: inline-block;
+            width: 40vh;
+            height: 40vh;
+            position: absolute;
+            margin: auto;
+            top: 50%; left: 50%;
+            margin-top: -35vh;
+            margin-left: -20vh;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.7);
+            border-radius: 5px;
+        }
+        .menu_button{
+            position: fixed;
+            top: 0px !important;
+            left: 0px !important;
+            background: white;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="hanged_man">
+            <img id="image" src="0.png"/>
+        </div>
+        <div class="row" id="password"></div>
+        <div id="letters">
+            <div class="row">
+                <button class="letter vowel" id="A">A</button>
+                <button class="letter" id="Ą">Ą</button>
+                <button class="letter" id="B">B</button>
+                <button class="letter" id="C">C</button>
+                <button class="letter" id="Ć">Ć</button>
+                <button class="letter" id="D">D</button>
+                <button class="letter vowel" id="E">E</button>
+                <button class="letter" id="Ę">Ę</button>
+                <button class="letter" id="F">F</button>
+                <button class="letter" id="G">G</button>
+                <button class="letter" id="H">H</button>
+                <button class="letter vowel" id="I">I</button>
+            </div>
+            <div class="row">
+                <button class="letter" id="J">J</button>
+                <button class="letter" id="K">K</button>
+                <button class="letter" id="L">L</button>
+                <button class="letter" id="Ł">Ł</button>
+                <button class="letter" id="M">M</button>
+                <button class="letter" id="N">N</button>
+                <button class="letter" id="Ń">Ń</button>
+                <button class="letter vowel" id="O">O</button>
+                <button class="letter" id="Ó">Ó</button>
+                <button class="letter" id="P">P</button>
+                <button class="letter" id="Q">Q</button>
+                <button class="letter" id="R">R</button>
+            </div>
+            <div class="row">
+                <button class="letter" id="S">S</button>
+                <button class="letter" id="Ś">Ś</button>
+                <button class="letter" id="T">T</button>
+                <button class="letter vowel" id="U">U</button>
+                <button class="letter" id="V">V</button>
+                <button class="letter" id="W">W</button>
+                <button class="letter" id="X">X</button>
+                <button class="letter vowel" id="Y">Y</button>
+                <button class="letter" id="Z">Z</button>
+                <button class="letter" id="Ź">Ź</button>
+                <button class="letter" id="Ż">Ż</button>
+            </div>
+        </div>
+    </div>
+</body>
+    <script>
+        var password;
+        var guessed = "";
+        var alfabet = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻ";
+        var error_counter = 0;
+        
+        
+        $().ready(function(){
+            roll();
+        });
+        
+        $(".letter").click(function(event){
+            $(this).addClass("inactive"); 
+            var letter = event.target.id;
+            var indices = [];
+            for(var i=0; i<password.length; i++){
+                if(password[i] == letter) indices.push(i);
+            }
+            if(indices.length <= 0){
+                error_counter++;
+            }
+            for(var i=0; i<indices.length; i++){
+                guessed = guessed.replaceAt(indices[i],letter);
+            }
+            console.log(guessed);
+            update();
+            checkEnd();
+        });
+        
+        function roll(){
+            document.getElementById("hanged_man").innerHTML = '<img id="image" src="0.png"/>';
+            error_counter = 0;
+            guessed = "";
+            password = "";
+            for(var i=0;i<passwords.length; i++){
+                passwords[i] = passwords[i].toUpperCase();
+            }
+            var index = getRandom(0,passwords.length-1);
+            console.log(index);
+            password = passwords[index];
+            document.getElementById("password").innerHTML = "";
+            for(var i=0; i<password.length; i++){
+                if(password[i] == String.fromCharCode(32)){
+                    guessed += " ";
+                }
+                else{
+                    guessed += "_";
+                }
+            }
+            for(var i=0; i<alfabet.length; i++){
+                $("#"+alfabet[i]).removeClass("inactive");
+            }
+            update();
+        }
+        
+        function update(){
+            document.getElementById("password").innerHTML = "";
+            for(var i=0; i<guessed.length; i++){
+                document.getElementById("password").innerHTML += "<p>"+guessed[i]+"</p>";
+            }
+            $("#image").attr("src", error_counter+".png");
+        }
+        
+        function checkEnd(){
+            update();
+            if(guessed.toUpperCase().trim() === password.toUpperCase().trim()){
+                document.getElementById("hanged_man").innerHTML = "BRAWO! Jesteś zwycięzcą! :)"+again;
+                guessed = password;
+                update();
+                for(var i=0; i<alfabet.length; i++){
+                    $("#"+alfabet[i]).addClass("inactive");
+                }
+            }
+            if(error_counter >= 10){
+                document.getElementById("hanged_man").innerHTML = "NIESTETY! Przegrałeś, spróbuj ponownie :("+again;
+                guessed = password;
+                update();
+                for(var i=0; i<alfabet.length; i++){
+                    $("#"+alfabet[i]).addClass("inactive");
+                }
+            }
+        }
+        
+        function getRandom(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        String.prototype.replaceAt=function(index, character) {
+            return this.substr(0, index) + character + this.substr(index+character.length);
+        }
+        var passwords = ["Trzynasta dzielnica jest niemiła","koza", "Jazda bez trzymanki","żeby kózka nie skakała"];
+        //var passwords=["dziewczyna","generał","przyjaciel","olbrzym","kraj","miasto","obrazki","mapa","plakat","krzesło","zeszyt","książka","kosz","pisak","koń","teczka","banan","pomidor","morze","kamień","długopis","gumka","stół","ołówek","gąbka","tablica","auto","mleko","temat","drzewo","noc","plecak","kawa","kwiat","smutek","wojna","pokój","nadzieja","niepokój","stres","miłość","przyjaźń","spokój","radość"];
+        var again = '<button class="letter" onclick="roll()">JESZCZE RAZ</button>';
+    </script>
+</html>

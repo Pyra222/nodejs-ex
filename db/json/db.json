@@ -1,0 +1,20 @@
+{"projects":[
+    {
+        "name":"Soccer",
+        "description":"Implementation of pen-and-paper game of \"Soccer\".",
+        "url":"/projects/pilkarzyki.html",
+        "thumbnail":"soccer.png"
+    },
+    {
+        "name":"This page",
+        "description":"My first attempt at responsive web design. Looks like it is working pretty well.",
+        "url":"/",
+        "thumbnail":"page.png"
+    },
+    {
+        "name":"Third big project",
+        "description":"TBD. Release date not available.",
+        "url":"about:blank",
+        "thumbnail":"placeholder.png"
+    }
+]}
